@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LCARS OS - Portaal</title>
+    <style>
+        :root {
+            --android-dark: #121212;
+            --android-surface: #1e1e1e;
+            --android-primary: #ff9900;
+            --android-text: #e0e0e0;
+            --android-red: #cc6666;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; }
+        body { background-color: var(--android-dark); color: var(--android-text); height: 100vh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; }
+        .app-bar { height: 60px; background-color: var(--android-surface); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid var(--android-primary); }
+        .app-title { font-size: 20px; font-weight: bold; color: var(--android-primary); }
+        .main-content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background-color: var(--android-surface); border-radius: 16px; padding: 30px; width: 100%; max-width: 400px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 20px; border: 1px solid #333; }
+        .login-card h2 { color: var(--android-primary); font-size: 22px; text-align: center; }
+        .login-card p { font-size: 14px; text-align: center; color: #aaa; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: var(--android-primary); text-transform: uppercase; }
+        .input-field { width: 100%; padding: 14px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .btn-android { background-color: var(--android-primary); color: black; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; }
+        .error-msg { color: var(--android-red); font-size: 13px; text-align: center; font-weight: bold; }
+    </style>
+    <script>
+        sessionStorage.removeItem("lcars_logged_in");
+        localStorage.removeItem("lcars_user");
+    </script>
+</head>
+<body>
+    <div class="app-bar">
+        <div class="app-title">LCARS OS</div>
+        <div id="stardate-display" style="font-size: 13px; color: #888;">STARDATE: --</div>
+    </div>
+    <div class="main-content">
+        <div class="login-card">
+            <h2>TOEGANGSCONTROLE</h2>
+            <p>Voer je e-mailadres in om te starten.</p>
+            <div class="input-group">
+                <label>E-mailadres</label>
+                <input type="email" id="email-input" class="input-field" value="Luukwagt0@gmail.com">
+            </div>
+            <button class="btn-android" onclick="loginSysteem()">START APPLICATIE</button>
+            <div id="login-error" class="error-msg"></div>
+        </div>
+    </div>
+    <script>
+        const ADMIN_EMAIL = "Luukwagt0@gmail.com";
+        function updateStardate() {
+            let nu = new Date();
+            let jaar = nu.getFullYear();
+            let start = new Date(jaar, 0, 1);
+            let sd = (jaar - 2323 + ((nu - start) / (1000 * 60 * 60 * 24 * 365.25))) * 1000;
+            let el = document.getElementById("stardate-display");
+            if (el) el.innerText = "STARDATE: " + sd.toFixed(1);
+        }
+        setInterval(updateStardate, 1000);
+        updateStardate();
+
+        function loginSysteem() {
+            let email = document.getElementById("email-input").value.trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                document.getElementById("login-error").innerText = "Voer een geldig e-mailadres in.";
+                return;
+            }
+            let role = (email === ADMIN_EMAIL.toLowerCase()) ? "admin" : "user";
+            sessionStorage.setItem("lcars_logged_in", "true");
+            localStorage.setItem("lcars_user", JSON.stringify({ name: email.split('@')[0], email: email, role: role }));
+            window.location.href = "dashboard.html";
+        }
+    </script>
+</body>
+</html>
