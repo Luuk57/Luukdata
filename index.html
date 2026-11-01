@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LCARS OS - Portaal</title>
+    <title>LCARS OS - Pincode Beveiliging</title>
     <style>
         :root {
             --android-dark: #121212;
@@ -39,17 +39,27 @@
     <div class="main-content">
         <div class="login-card">
             <h2>TOEGANGSCONTROLE</h2>
-            <p>Voer je e-mailadres in om te starten.</p>
+            <p>Voer je e-mail en pincode in.</p>
+            
             <div class="input-group">
                 <label>E-mailadres</label>
-                <input type="email" id="email-input" class="input-field" value="Luukwagt0@gmail.com">
+                <!-- Het veld is nu leeg, er staat geen vast e-mailadres meer ingevuld -->
+                <input type="email" id="email-input" class="input-field" placeholder="Jouw e-mailadres">
             </div>
-            <button class="btn-android" onclick="loginSysteem()">START APPLICATIE</button>
+
+            <div class="input-group">
+                <label>Pincode (4 cijfers)</label>
+                <input type="password" id="pin-input" class="input-field" maxlength="4" placeholder="••••">
+            </div>
+
+            <button class="btn-android" onclick="loginSysteem()">INLOGGEN</button>
             <div id="login-error" class="error-msg"></div>
         </div>
     </div>
     <script>
-        const ADMIN_EMAIL = "Luukwagt0@gmail.com";
+        const ADMIN_EMAIL = "luukwagt0@gmail.com";
+        const ADMIN_PIN = "1234"; // Je kunt deze pincode hier zelf aanpassen naar wat je wilt!
+
         function updateStardate() {
             let nu = new Date();
             let jaar = nu.getFullYear();
@@ -63,11 +73,19 @@
 
         function loginSysteem() {
             let email = document.getElementById("email-input").value.trim().toLowerCase();
+            let pin = document.getElementById("pin-input").value.trim();
+
             if (!email || !email.includes('@')) {
                 document.getElementById("login-error").innerText = "Voer een geldig e-mailadres in.";
                 return;
             }
-            let role = (email === ADMIN_EMAIL.toLowerCase()) ? "admin" : "user";
+
+            if (email === ADMIN_EMAIL && pin !== ADMIN_PIN) {
+                document.getElementById("login-error").innerText = "Onjuiste pincode!";
+                return;
+            }
+
+            let role = (email === ADMIN_EMAIL) ? "admin" : "user";
             sessionStorage.setItem("lcars_logged_in", "true");
             localStorage.setItem("lcars_user", JSON.stringify({ name: email.split('@')[0], email: email, role: role }));
             window.location.href = "dashboard.html";
