@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LCARS OS - Dashboard</title>
+    <style>
+        :root {
+            --android-dark: #121212;
+            --android-surface: #1e1e1e;
+            --android-primary: #ff9900;
+            --android-text: #e0e0e0;
+            --android-blue: #9999ff;
+            --android-purple: #cc99cc;
+            --android-red: #cc6666;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; }
+        body { background-color: var(--android-dark); color: var(--android-text); height: 100vh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; }
+        .app-bar { height: 60px; background-color: var(--android-surface); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid var(--android-primary); flex-shrink: 0; }
+        .app-title { font-size: 18px; font-weight: bold; color: var(--android-primary); }
+        .user-info { font-size: 13px; color: #aaa; }
+        .logout-btn { background: var(--android-red); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .workspace { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .section-title { font-size: 15px; font-weight: bold; color: var(--android-primary); border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .app-tile { background-color: var(--android-surface); border: 1px solid #333; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; cursor: pointer; min-height: 120px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .app-tile:active { transform: scale(0.97); background-color: #282828; }
+        .app-tile-icon { font-size: 28px; }
+        .app-tile-name { font-size: 15px; font-weight: bold; color: white; }
+        .tile-vocht { border-top: 4px solid var(--android-primary); }
+        .tile-eet { border-top: 4px solid var(--android-purple); }
+        .tile-sheets { border-top: 4px solid var(--android-blue); }
+        @media (max-width: 768px) {
+            .app-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+    </style>
+    <script>
+        let userSession = sessionStorage.getItem("lcars_logged_in");
+        let userData = JSON.parse(localStorage.getItem("lcars_user"));
+        if (userSession !== "true" || !userData) {
+            window.location.replace("index.html");
+        }
+    </script>
+</head>
+<body>
+    <div class="app-bar">
+        <div>
+            <div class="app-title">LCARS LAUNCHER</div>
+            <div class="user-info" id="welcome-user">Welkom</div>
+        </div>
+        <button class="logout-btn" onclick="logout()">VERGRENDEL</button>
+    </div>
+    <div class="workspace">
+        <div class="section-title">MODULES & LIVE DATA</div>
+        <div class="app-grid" id="apps-grid"></div>
+    </div>
+    <script>
+        document.getElementById("welcome-user").innerText = "Ingelogd als: " + userData.name.toUpperCase();
+
+        const apps = [
+            { name: "VOCHT MONITOR", url: "vochtmonitor.html", icon: "💧", class: "tile-vocht" },
+            { name: "EET MONITOR", url: "eetmonitor2.html", icon: "🍽️", class: "tile-eet" }
+            // Hier kun je straks je Google Sheets web-app link of embed aan toevoegen!
+        ];
+
+        const container = document.getElementById("apps-grid");
+        apps.forEach(app => {
+            let tile = document.createElement("div");
+            tile.className = `app-tile ${app.class}`;
+            tile.innerHTML = `<div class="app-tile-icon">${app.icon}</div><div class="app-tile-name">${app.name}</div>`;
+            tile.onclick = () => { window.location.href = app.url; };
+            container.appendChild(tile);
+        });
+
+        function logout() {
+            sessionStorage.removeItem("lcars_logged_in");
+            localStorage.removeItem("lcars_user");
+            window.location.replace("index.html");
+        }
+    </script>
+</body>
+</html>
